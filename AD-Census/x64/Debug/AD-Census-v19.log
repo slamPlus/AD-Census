@@ -1,0 +1,43 @@
+﻿  ADCensusStereo.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\ADCensusStereo.cpp(366,32): warning C4244: “=”: 从“sint32”转换到“float32”，可能丢失数据
+  adcensus_util.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_util.cpp(145,10): warning C4244: “return”: 从“float”转换到“uint8”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_util.cpp(147,23): warning C4267: “初始化”: 从“size_t”转换到“sint32”，可能丢失数据
+  cost_aggregator_2.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(8,24): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(104,25): warning C4244: “=”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(105,25): warning C4244: “=”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(109,21): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(110,21): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+  cost_computor.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_computor.cpp(16,25): warning C4305: “初始化”: 从“double”到“float32”截断
+  cross_aggregator.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+  main.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(241,31): warning C4477: “fprintf_s”: 格式字符串“%f”需要类型“double”的参数，但可变参数 3 拥有了类型“int”
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(264,19): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(265,19): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(271,26): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(272,26): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(273,26): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(274,26): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(276,42): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(335,20): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(386,19): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(387,19): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(393,40): warning C4244: “=”: 从“double”转换到“uchar”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(404,21): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(422,19): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(423,13): warning C4244: “初始化”: 从“double”转换到“float32”，可能丢失数据
+  multistep_refiner.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+E:\3d_reconstruction\AD-Census-master\AD-Census\multistep_refiner.cpp(277,24): warning C4244: “=”: 从“sint32”转换到“float32”，可能丢失数据
+  scanline_optimizer.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_types.h(97,1): warning C4305: “初始化”: 从“double”到“float32”截断
+  正在生成代码...
+  AD-Census-v19.vcxproj -> E:\3d_reconstruction\AD-Census-master\x64\Debug\AD-Census-v19.exe

@@ -1,0 +1,1 @@
+﻿E:\3d_reconstruction\AD-Census-master\AD-Census\AD-Census-v19.vcxproj(70,5): error MSB4019: 找不到导入的项目“E:\3d_reconstruction\PatchMatchStereo-master\PatchMatchStereo\OpencvRelease.props”。请确认 Import 声明“..\..\PatchMatchStereo-master\PatchMatchStereo\OpencvRelease.props”中的表达式正确，且文件位于磁盘上。

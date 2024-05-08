@@ -1,0 +1,16 @@
+﻿  ADCensusStereo.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\ADCensusStereo.cpp(393,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  adcensus_util.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\adcensus_util.cpp(301,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  cost_aggregator_2.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_aggregator_2.cpp(219,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  cost_computor.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\cost_computor.cpp(201,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  cross_aggregator.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\cross_aggregator.cpp(403,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  multistep_refiner.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\multistep_refiner.cpp(588,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  main.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\main.cpp(439,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
+  scanline_optimizer.cpp
+E:\3d_reconstruction\AD-Census-master\AD-Census\scanline_optimizer.cpp(285,1): fatal  error C1010: 在查找预编译头时遇到意外的文件结尾。是否忘记了向源中添加“#include "stdafx.h"”?
