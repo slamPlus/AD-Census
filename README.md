@@ -1,7 +1,7 @@
 # AD-Census
 Improved the AD-Census algorithm, ① adaptive weight cost aggregation algorithm, ② implemented pre-processing and simplified original post-processing filtering algorithm.\
 实现了改进的 AD-Census 算法，① 基于自适应权重的代价聚合算法，② 实现了预处理和简化的后处理滤波算法
-
+![](https://s2.loli.net/2024/05/17/vgyYkBfP3j76WlU.png)
 ## Reference 参考文献
 
 [1] Mei X , Sun X , Zhou M , et al. <b>On building an accurate stereo matching system on graphics hardware</b>[C]// IEEE International Conference on Computer Vision Workshops. IEEE, 2012.
