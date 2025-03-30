@@ -6,6 +6,8 @@
 
 #include "cost_computor.h"
 #include "adcensus_util.h"
+#include <cmath>
+
 
 CostComputor::CostComputor(): width_(0), height_(0), img_left_(nullptr), img_right_(nullptr),
                               lambda_ad_(0), lambda_census_(0), min_disparity_(0), max_disparity_(0),
@@ -30,13 +32,13 @@ bool CostComputor::Initialize(const sint32& width, const sint32& height, const s
 		return false;
 	}
 
-	// »Ò¶ÈÊý¾Ý£¨×óÓÒÓ°Ïñ£©
+	// ï¿½Ò¶ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
 	gray_left_.resize(img_size);
 	gray_right_.resize(img_size);
-	// censusÊý¾Ý£¨×óÓÒÓ°Ïñ£©
+	// censusï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
 	census_left_.resize(img_size,0);
 	census_right_.resize(img_size,0);
-	// ³õÊ¼´ú¼ÛÊý¾Ý
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cost_init_.resize(img_size * disp_range);
 
 	is_initialized_ = !gray_left_.empty() && !gray_right_.empty() && !census_left_.empty() && !census_right_.empty() && !cost_init_.empty();
@@ -57,7 +59,7 @@ void CostComputor::SetParams(const sint32& lambda_ad, const sint32& lambda_censu
 
 void CostComputor::ComputeGray()
 {
-	// ²ÊÉ«×ª»Ò¶È
+	// ï¿½ï¿½É«×ªï¿½Ò¶ï¿½
 	for (sint32 n = 0; n < 2; n++) {
 		const auto color = (n == 0) ? img_left_ : img_right_;
 		auto& gray = (n == 0) ? gray_left_ : gray_right_;
@@ -74,7 +76,7 @@ void CostComputor::ComputeGray()
 
 void CostComputor::CensusTransform()
 {
-	// ×óÓÒÓ°Ïñcensus±ä»»
+	// ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½censusï¿½ä»»
 	adcensus_util::census_transform_9x7(&gray_left_[0], census_left_, width_, height_);
 	adcensus_util::census_transform_9x7(&gray_right_[0], census_right_, width_, height_);
 }
@@ -83,18 +85,18 @@ void CostComputor::ComputeCost()
 {
 	const sint32 disp_range = max_disparity_ - min_disparity_;
 
-	// Ô¤Éè²ÎÊý
+	// Ô¤ï¿½ï¿½ï¿½ï¿½ï¿½
 	const auto lambda_ad = lambda_ad_;
 	const auto lambda_census = lambda_census_;
 
-	// ¼ÆËã´ú¼Û
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for (sint32 y = 0; y < height_; y++) {
 		for (sint32 x = 0; x < width_; x++) {
 			const auto bl = img_left_[y * width_ * 3 + 3 * x];
 			const auto gl = img_left_[y * width_ * 3 + 3 * x + 1];
 			const auto rl = img_left_[y * width_ * 3 + 3 * x + 2];
 			const auto& census_val_l = census_left_[y * width_ + x];
-			// ÖðÊÓ²î¼ÆËã´ú¼ÛÖµ
+			// ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 			for (sint32 d = min_disparity_; d < max_disparity_; d++) {
 				auto& cost = cost_init_[y * width_ * disp_range + x * disp_range + (d - min_disparity_)];
 				const sint32 xr = x - d;
@@ -103,17 +105,17 @@ void CostComputor::ComputeCost()
 					continue;
 				}
 
-				// ad´ú¼Û
+				// adï¿½ï¿½ï¿½ï¿½
 				const auto br = img_right_[y * width_ * 3 + 3 * xr];
 				const auto gr = img_right_[y * width_ * 3 + 3 * xr + 1];
 				const auto rr = img_right_[y * width_ * 3 + 3 * xr + 2];
 				const float32 cost_ad = (abs(bl - br) + abs(gl - gr) + abs(rl - rr)) / 3.0f;
 
-				// census´ú¼Û
+				// censusï¿½ï¿½ï¿½ï¿½
 				const auto& census_val_r = census_right_[y * width_ + xr];
 				const float32 cost_census = static_cast<float32>(adcensus_util::Hamming64(census_val_l, census_val_r));
 
-				// ad-census´ú¼Û
+				// ad-censusï¿½ï¿½ï¿½ï¿½
 				cost = 1 - exp(-cost_ad / lambda_ad) + 1 - exp(-cost_census / lambda_census);
 			}
 		}
@@ -126,13 +128,13 @@ void CostComputor::Compute()
 		return;
 	}
 
-	// ¼ÆËã»Ò¶ÈÍ¼
+	// ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½Í¼
 	ComputeGray();
 
-	// census±ä»»
+	// censusï¿½ä»»
 	CensusTransform();
 
-	// ´ú¼Û¼ÆËã
+	// ï¿½ï¿½ï¿½Û¼ï¿½ï¿½ï¿½
 	ComputeCost();
 }
 

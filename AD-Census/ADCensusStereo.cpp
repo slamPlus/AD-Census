@@ -6,6 +6,8 @@
 #include "ADCensusStereo.h"
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
+#include <cstring>
 using namespace std::chrono;
 
 ADCensusStereo::ADCensusStereo(): width_(0), height_(0), img_left_(nullptr), img_right_(nullptr),
@@ -20,42 +22,42 @@ ADCensusStereo::~ADCensusStereo()
 
 bool ADCensusStereo::Initialize(const sint32& width, const sint32& height, const ADCensusOption& option)
 {
-	// ¡¤¡¤¡¤ ¸³Öµ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Öµ
 
-	// Ó°Ïñ³ß´ç
+	// Ó°ï¿½ï¿½ß´ï¿½
 	width_ = width;
 	height_ = height;
-	// Ëã·¨²ÎÊý
+	// ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½
 	option_ = option;
 
 	if (width <= 0 || height <= 0) {
 		return false;
 	}
 
-	//¡¤¡¤¡¤ ¿ª±ÙÄÚ´æ¿Õ¼ä
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½Õ¼ï¿½
 	const sint32 img_size = width_ * height_;
 	const sint32 disp_range = option_.max_disparity - option_.min_disparity;
 	if (disp_range <= 0) {
 		return false;
 	}
 
-	// ÊÓ²îÍ¼
+	// ï¿½Ó²ï¿½Í¼
 	disp_left_ = new float32[img_size];
 	disp_right_ = new float32[img_size];
 
-	// ³õÊ¼»¯´ú¼Û¼ÆËãÆ÷
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Û¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	if(!cost_computer_.Initialize(width_,height_,option_.min_disparity,option_.max_disparity)) {
 		is_initialized_ = false;
 		return is_initialized_;
 	}
 
-	// ³õÊ¼»¯´ú¼Û¾ÛºÏÆ÷
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Û¾Ûºï¿½ï¿½ï¿½
 	if(!aggregator_.Initialize(width_, height_,option_.min_disparity,option_.max_disparity)) {
 		is_initialized_ = false;
 		return is_initialized_;
 	}
 
-	// ³õÊ¼»¯¶à²½ÓÅ»¯Æ÷
+	// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½à²½ï¿½Å»ï¿½ï¿½ï¿½
 	if (!refiner_.Initialize(width_, height_)) {
 		is_initialized_ = false;
 		return is_initialized_;
@@ -80,7 +82,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 
 	auto start = steady_clock::now();
 
-	// ´ú¼Û¼ÆËã
+	// ï¿½ï¿½ï¿½Û¼ï¿½ï¿½ï¿½
 	ComputeCost();
 
 	auto end = steady_clock::now();
@@ -88,7 +90,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 	printf("computing cost! timing :	%lf s\n", tt.count() / 1000.0);
 	start = steady_clock::now();
 
-	// ´ú¼Û¾ÛºÏ
+	// ï¿½ï¿½ï¿½Û¾Ûºï¿½
 	CostAggregation();
 
 	end = steady_clock::now();
@@ -96,7 +98,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 	printf("cost aggregating! timing :	%lf s\n", tt.count() / 1000.0);
 	start = steady_clock::now();
 
-	// É¨ÃèÏßÓÅ»¯
+	// É¨ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
 	ScanlineOptimize();
 
 	end = steady_clock::now();
@@ -104,7 +106,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 	printf("scanline optimizing! timing :	%lf s\n", tt.count() / 1000.0);
 	start = steady_clock::now();
 
-	// ¼ÆËã×óÓÒÊÓÍ¼ÊÓ²î
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½Ó²ï¿½
 	ComputeDisparity();
 	ComputeDisparityRight();
 
@@ -113,7 +115,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 	printf("computing disparities! timing :	%lf s\n", tt.count() / 1000.0);
 	start = steady_clock::now();
 
-	// ¶à²½ÖèÊÓ²îÓÅ»¯
+	// ï¿½à²½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½Å»ï¿½
 	MultiStepRefine();
 
 	end = steady_clock::now();
@@ -121,7 +123,7 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 	printf("multistep refining! timing :	%lf s\n", tt.count() / 1000.0);
 	start = steady_clock::now();
 
-	// Êä³öÊÓ²îÍ¼
+	// ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Í¼
 	memcpy(disp_left, disp_left_, height_ * width_ * sizeof(float32));
 	
 	end = steady_clock::now();
@@ -133,55 +135,55 @@ bool ADCensusStereo::Match(const uint8* img_left, const uint8* img_right, float3
 
 bool ADCensusStereo::Reset(const uint32& width, const uint32& height, const ADCensusOption& option)
 {
-	// ÊÍ·ÅÄÚ´æ
+	// ï¿½Í·ï¿½ï¿½Ú´ï¿½
 	Release();
 
-	// ÖØÖÃ³õÊ¼»¯±ê¼Ç
+	// ï¿½ï¿½ï¿½Ã³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	is_initialized_ = false;
 
-	// ³õÊ¼»¯
+	// ï¿½ï¿½Ê¼ï¿½ï¿½
 	return Initialize(width, height, option);
 }
 
 
 void ADCensusStereo::ComputeCost()
 {
-	// ÉèÖÃ´ú¼Û¼ÆËãÆ÷Êý¾Ý
+	// ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Û¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cost_computer_.SetData(img_left_, img_right_);
-	// ÉèÖÃ´ú¼Û¼ÆËãÆ÷²ÎÊý
+	// ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Û¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cost_computer_.SetParams(option_.lambda_ad, option_.lambda_census);
-	// ¼ÆËã´ú¼Û
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cost_computer_.Compute();
 }
 
 void ADCensusStereo::CostAggregation()
 {
-	// ÉèÖÃ¾ÛºÏÆ÷Êý¾Ý
+	// ï¿½ï¿½ï¿½Ã¾Ûºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	aggregator_.SetData(img_left_, img_right_, cost_computer_.get_cost_ptr());
-	// ÉèÖÃ¾ÛºÏÆ÷²ÎÊý
+	// ï¿½ï¿½ï¿½Ã¾Ûºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	aggregator_.SetParams(option_.cross_L1, option_.cross_L2, option_.cross_t1, option_.cross_t2);
-	// ´ú¼Û¾ÛºÏ
+	// ï¿½ï¿½ï¿½Û¾Ûºï¿½
 	aggregator_.Aggregate(4);
 }
 
 void ADCensusStereo::ScanlineOptimize()
 {
-	// ÉèÖÃÓÅ»¯Æ÷Êý¾Ý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	scan_line_.SetData(img_left_, img_right_, cost_computer_.get_cost_ptr(), aggregator_.get_cost_ptr());
-	// ÉèÖÃÓÅ»¯Æ÷²ÎÊý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	scan_line_.SetParam(width_, height_, option_.min_disparity, option_.max_disparity, option_.so_p1, option_.so_p2, option_.so_tso);
-	// É¨ÃèÏßÓÅ»¯
+	// É¨ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½
 	scan_line_.Optimize();
 }
 
 void ADCensusStereo::MultiStepRefine()
 {
-	// ÉèÖÃ¶à²½ÓÅ»¯Æ÷Êý¾Ý
+	// ï¿½ï¿½ï¿½Ã¶à²½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	refiner_.SetData(img_left_, aggregator_.get_cost_ptr(), aggregator_.get_arms_ptr(), disp_left_, disp_right_);
-	// ÉèÖÃ¶à²½ÓÅ»¯Æ÷²ÎÊý
+	// ï¿½ï¿½ï¿½Ã¶à²½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	refiner_.SetParam(option_.min_disparity, option_.max_disparity, option_.irv_ts, option_.irv_th, option_.lrcheck_thres,
 					  option_.do_lr_check,option_.do_filling,option_.do_filling, option_.do_discontinuity_adjustment);
-	// ¶à²½ÓÅ»¯
+	// ï¿½à²½ï¿½Å»ï¿½
 	refiner_.Refine();
 }
 
@@ -194,24 +196,24 @@ void ADCensusStereo::ComputeDisparity()
 		return;
 	}
 
-	// ×óÓ°ÏñÊÓ²îÍ¼
+	// ï¿½ï¿½Ó°ï¿½ï¿½ï¿½Ó²ï¿½Í¼
 	const auto disparity = disp_left_;
-	// ×óÓ°Ïñ¾ÛºÏ´ú¼ÛÊý×é
+	// ï¿½ï¿½Ó°ï¿½ï¿½ÛºÏ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	const auto cost_ptr = aggregator_.get_cost_ptr();
 
 	const sint32 width = width_;
 	const sint32 height = height_;
 
-	// ÎªÁË¼Ó¿ì¶ÁÈ¡Ð§ÂÊ£¬°Ñµ¥¸öÏñËØµÄËùÓÐ´ú¼ÛÖµ´æ´¢µ½¾Ö²¿Êý×éÀï
+	// Îªï¿½Ë¼Ó¿ï¿½ï¿½È¡Ð§ï¿½Ê£ï¿½ï¿½Ñµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Öµï¿½æ´¢ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	std::vector<float32> cost_local(disp_range);
 
-	// ---ÖðÏñËØ¼ÆËã×îÓÅÊÓ²î
+	// ---ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½
 	for (sint32 i = 0; i < height; i++) {
 		for (sint32 j = 0; j < width; j++) {
 			float32 min_cost = Large_Float;
 			sint32 best_disparity = 0;
 
-			// ---±éÀúÊÓ²î·¶Î§ÄÚµÄËùÓÐ´ú¼ÛÖµ£¬Êä³ö×îÐ¡´ú¼ÛÖµ¼°¶ÔÓ¦µÄÊÓ²îÖµ
+			// ---ï¿½ï¿½ï¿½ï¿½ï¿½Ó²î·¶Î§ï¿½Úµï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½Ó²ï¿½Öµ
 			for (sint32 d = min_disparity; d < max_disparity; d++) {
 				const sint32 d_idx = d - min_disparity;
 				const auto& cost = cost_local[d_idx] = cost_ptr[i * width * disp_range + j * disp_range + d_idx];
@@ -220,17 +222,17 @@ void ADCensusStereo::ComputeDisparity()
 					best_disparity = d;
 				}
 			}
-			// ---×ÓÏñËØÄâºÏ
+			// ---ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if (best_disparity == min_disparity || best_disparity == max_disparity - 1) {
 				disparity[i * width + j] = Invalid_Float;
 				continue;
 			}
-			// ×îÓÅÊÓ²îÇ°Ò»¸öÊÓ²îµÄ´ú¼ÛÖµcost_1£¬ºóÒ»¸öÊÓ²îµÄ´ú¼ÛÖµcost_2
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ç°Ò»ï¿½ï¿½ï¿½Ó²ï¿½Ä´ï¿½ï¿½ï¿½Öµcost_1ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ó²ï¿½Ä´ï¿½ï¿½ï¿½Öµcost_2
 			const sint32 idx_1 = best_disparity - 1 - min_disparity;
 			const sint32 idx_2 = best_disparity + 1 - min_disparity;
 			const float32 cost_1 = cost_local[idx_1];
 			const float32 cost_2 = cost_local[idx_2];
-			// ½âÒ»Ôª¶þ´ÎÇúÏß¼«Öµ
+			// ï¿½ï¿½Ò»Ôªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½Öµ
 			const float32 denom = cost_1 + cost_2 - 2 * min_cost;
 			if (denom != 0.0f) {
 				disparity[i * width + j] = static_cast<float32>(best_disparity) + (cost_1 - cost_2) / (denom * 2.0f);
@@ -251,26 +253,26 @@ void ADCensusStereo::ComputeDisparityRight()
 		return;
 	}
 
-	// ÓÒÓ°ÏñÊÓ²îÍ¼
+	// ï¿½ï¿½Ó°ï¿½ï¿½ï¿½Ó²ï¿½Í¼
 	const auto disparity = disp_right_;
-	// ×óÓ°Ïñ¾ÛºÏ´ú¼ÛÊý×é
+	// ï¿½ï¿½Ó°ï¿½ï¿½ÛºÏ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	const auto cost_ptr = aggregator_.get_cost_ptr();
 
 	const sint32 width = width_;
 	const sint32 height = height_;
 
-	// ÎªÁË¼Ó¿ì¶ÁÈ¡Ð§ÂÊ£¬°Ñµ¥¸öÏñËØµÄËùÓÐ´ú¼ÛÖµ´æ´¢µ½¾Ö²¿Êý×éÀï
+	// Îªï¿½Ë¼Ó¿ï¿½ï¿½È¡Ð§ï¿½Ê£ï¿½ï¿½Ñµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½Öµï¿½æ´¢ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	std::vector<float32> cost_local(disp_range);
 
-	// ---ÖðÏñËØ¼ÆËã×îÓÅÊÓ²î
-	// Í¨¹ý×óÓ°ÏñµÄ´ú¼Û£¬»ñÈ¡ÓÒÓ°ÏñµÄ´ú¼Û
-	// ÓÒcost(xr,yr,d) = ×ócost(xr+d,yl,d)
+	// ---ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½
+	// Í¨ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½Ä´ï¿½ï¿½Û£ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ó°ï¿½ï¿½Ä´ï¿½ï¿½ï¿½
+	// ï¿½ï¿½cost(xr,yr,d) = ï¿½ï¿½cost(xr+d,yl,d)
 	for (sint32 i = 0; i < height; i++) {
 		for (sint32 j = 0; j < width; j++) {
 			float32 min_cost = Large_Float;
 			sint32 best_disparity = 0;
 
-			// ---Í³¼ÆºòÑ¡ÊÓ²îÏÂµÄ´ú¼ÛÖµ
+			// ---Í³ï¿½Æºï¿½Ñ¡ï¿½Ó²ï¿½ï¿½ÂµÄ´ï¿½ï¿½ï¿½Öµ
 			for (sint32 d = min_disparity; d < max_disparity; d++) {
 				const sint32 d_idx = d - min_disparity;
 				const sint32 col_left = j + d;
@@ -286,18 +288,18 @@ void ADCensusStereo::ComputeDisparityRight()
 				}
 			}
 
-			// ---×ÓÏñËØÄâºÏ
+			// ---ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if (best_disparity == min_disparity || best_disparity == max_disparity - 1) {
 				disparity[i * width + j] = best_disparity;
 				continue;
 			}
 
-			// ×îÓÅÊÓ²îÇ°Ò»¸öÊÓ²îµÄ´ú¼ÛÖµcost_1£¬ºóÒ»¸öÊÓ²îµÄ´ú¼ÛÖµcost_2
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ç°Ò»ï¿½ï¿½ï¿½Ó²ï¿½Ä´ï¿½ï¿½ï¿½Öµcost_1ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ó²ï¿½Ä´ï¿½ï¿½ï¿½Öµcost_2
 			const sint32 idx_1 = best_disparity - 1 - min_disparity;
 			const sint32 idx_2 = best_disparity + 1 - min_disparity;
 			const float32 cost_1 = cost_local[idx_1];
 			const float32 cost_2 = cost_local[idx_2];
-			// ½âÒ»Ôª¶þ´ÎÇúÏß¼«Öµ
+			// ï¿½ï¿½Ò»Ôªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½Öµ
 			const float32 denom = cost_1 + cost_2 - 2 * min_cost;
 			if (denom != 0.0f) {
 				disparity[i * width + j] = static_cast<float32>(best_disparity) + (cost_1 - cost_2) / (denom * 2.0f);

@@ -5,7 +5,7 @@
 */
 
 #include "cross_aggregator.h"
-
+#include <cstring>
 CrossAggregator::CrossAggregator(): width_(0), height_(0), img_left_(nullptr), img_right_(nullptr),
                                     cost_init_(nullptr),
                                     cross_L1_(0), cross_L2_(0), cross_t1_(0), cross_t2_(0),
@@ -30,17 +30,17 @@ bool CrossAggregator::Initialize(const sint32& width, const sint32& height, cons
 		return is_initialized_;
 	}
 
-	// Îª½»²æÊ®×Ö±ÛÊı×é·ÖÅäÄÚ´æ
+	// Îªï¿½ï¿½ï¿½ï¿½Ê®ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	vec_cross_arms_.clear();
 	vec_cross_arms_.resize(img_size);
 
-	// ÎªÁÙÊ±´ú¼ÛÊı×é·ÖÅäÄÚ´æ
+	// Îªï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	vec_cost_tmp_[0].clear();
 	vec_cost_tmp_[0].resize(img_size);
 	vec_cost_tmp_[1].clear();
 	vec_cost_tmp_[1].resize(img_size);
 
-	// Îª´æ´¢Ã¿¸öÏñËØÖ§³ÖÇøÏñËØÊıÁ¿µÄÊı×é·ÖÅäÄÚ´æ
+	// Îªï¿½æ´¢Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	vec_sup_count_[0].clear();
 	vec_sup_count_[0].resize(img_size);
 	vec_sup_count_[1].clear();
@@ -48,7 +48,7 @@ bool CrossAggregator::Initialize(const sint32& width, const sint32& height, cons
 	vec_sup_count_tmp_.clear();
 	vec_sup_count_tmp_.resize(img_size);
 
-	// Îª¾ÛºÏ´ú¼ÛÊı×é·ÖÅäÄÚ´æ
+	// Îªï¿½ÛºÏ´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½
 	cost_aggr_.resize(img_size * disp_range);
 
 	is_initialized_ = !vec_cross_arms_.empty() && !vec_cost_tmp_[0].empty() && !vec_cost_tmp_[1].empty() 
@@ -75,7 +75,7 @@ void CrossAggregator::SetParams(const sint32& cross_L1, const sint32& cross_L2, 
 
 void CrossAggregator::BuildArms() 
 {
-	// ÖğÏñËØ¼ÆËãÊ®×Ö½»²æ±Û
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½Ê®ï¿½Ö½ï¿½ï¿½ï¿½ï¿½
 	for (sint32 y = 0; y < height_; y++) {
 		for (sint32 x = 0; x < width_; x++) {
 			CrossArm& arm = vec_cross_arms_[y * width_ + x];
@@ -94,25 +94,25 @@ void CrossAggregator::Aggregate(const sint32& num_iters)
 
 	const sint32 disp_range = max_disparity_ - min_disparity_;
 
-	// ¹¹½¨ÏñËØµÄÊ®×Ö½»²æ±Û
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Ê®ï¿½Ö½ï¿½ï¿½ï¿½ï¿½
 	BuildArms();
 
-	// ´ú¼Û¾ÛºÏ
-	// horizontal_first ´ú±íÏÈË®Æ½·½Ïò¾ÛºÏ
+	// ï¿½ï¿½ï¿½Û¾Ûºï¿½
+	// horizontal_first ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë®Æ½ï¿½ï¿½ï¿½ï¿½Ûºï¿½
 	bool horizontal_first = true;
 
-	// ¼ÆËãÁ½ÖÖ¾ÛºÏ·½ÏòµÄ¸÷ÏñËØÖ§³ÖÇøÏñËØÊıÁ¿
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾ÛºÏ·ï¿½ï¿½ï¿½Ä¸ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	ComputeSupPixelCount();
 
-	// ÏÈ½«¾ÛºÏ´ú¼Û³õÊ¼»¯Îª³õÊ¼´ú¼Û
+	// ï¿½È½ï¿½ï¿½ÛºÏ´ï¿½ï¿½Û³ï¿½Ê¼ï¿½ï¿½Îªï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
 	memcpy(&cost_aggr_[0], cost_init_, width_*height_*disp_range*sizeof(float32));
 
-	// ¶àµü´ú¾ÛºÏ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ûºï¿½
 	for (sint32 k = 0; k < num_iters; k++) {
 		for (sint32 d = min_disparity_; d < max_disparity_; d++) {
 			AggregateInArms(d, horizontal_first);
 		}
-		// ÏÂÒ»´Îµü´ú£¬µ÷»»Ë³Ğò
+		// ï¿½ï¿½Ò»ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½
 		horizontal_first = !horizontal_first;
 	}
 }
@@ -134,23 +134,23 @@ float32* CrossAggregator::get_cost_ptr()
 
 void CrossAggregator::FindHorizontalArm(const sint32& x, const sint32& y, uint8& left, uint8& right) const
 {
-	// ÏñËØÊı¾İµØÖ·
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İµï¿½Ö·
 	const auto img0 = img_left_ + y * width_ * 3 + 3 * x;
-	// ÏñËØÑÕÉ«Öµ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«Öµ
 	const ADColor color0(img0[0], img0[1], img0[2]);
 	
 	left = right = 0;
-	//¼ÆËã×óÓÒ±Û,ÏÈ×ó±ÛºóÓÒ±Û
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò±ï¿½,ï¿½ï¿½ï¿½ï¿½Ûºï¿½ï¿½Ò±ï¿½
 	sint32 dir = -1;
 	for (sint32 k = 0; k < 2; k++) {
-		// ÑÓÉì±ÛÖ±µ½Ìõ¼ş²»Âú×ã
-		// ±Û³¤²»µÃ³¬¹ıcross_L1
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// ï¿½Û³ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½ï¿½cross_L1
 		auto img = img0 + dir * 3;
 		auto color_last = color0;
 		sint32 xn = x + dir;
 		for (sint32 n = 0; n < std::min(cross_L1_, MAX_ARM_LENGTH); n++) {
 
-			// ±ß½ç´¦Àí
+			// ï¿½ß½ç´¦ï¿½ï¿½
 			if (k == 0) {
 				if (xn < 0) {
 					break;
@@ -162,16 +162,16 @@ void CrossAggregator::FindHorizontalArm(const sint32& x, const sint32& y, uint8&
 				}
 			}
 
-			// »ñÈ¡ÑÕÉ«Öµ
+			// ï¿½ï¿½È¡ï¿½ï¿½É«Öµ
 			const ADColor color(img[0], img[1], img[2]);
 
-			// ÑÕÉ«¾àÀë1£¨±ÛÉÏÏñËØºÍ¼ÆËãÏñËØµÄÑÕÉ«¾àÀë£©
+			// ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ØºÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ë£©
 			const sint32 color_dist1 = ColorDist(color, color0);
 			if (color_dist1 >= cross_t1_) {
 				break;
 			}
 
-			// ÑÕÉ«¾àÀë2£¨±ÛÉÏÏñËØºÍÇ°Ò»¸öÏñËØµÄÑÕÉ«¾àÀë£©
+			// ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½Ç°Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ë£©
 			if (n > 0) {
 				const sint32 color_dist2 = ColorDist(color, color_last);
 				if (color_dist2 >= cross_t1_) {
@@ -179,7 +179,7 @@ void CrossAggregator::FindHorizontalArm(const sint32& x, const sint32& y, uint8&
 				}
 			}
 
-			// ±Û³¤´óÓÚL2ºó£¬ÑÕÉ«¾àÀëãĞÖµ¼õĞ¡Îªt2
+			// ï¿½Û³ï¿½ï¿½ï¿½ï¿½ï¿½L2ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ğ¡Îªt2
 			if (n + 1 > cross_L2_) {
 				if (color_dist1 >= cross_t2_) {
 					break;
@@ -202,23 +202,23 @@ void CrossAggregator::FindHorizontalArm(const sint32& x, const sint32& y, uint8&
 
 void CrossAggregator::FindVerticalArm(const sint32& x, const sint32& y, uint8& top, uint8& bottom) const
 {
-	// ÏñËØÊı¾İµØÖ·
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İµï¿½Ö·
 	const auto img0 = img_left_ + y * width_ * 3 + 3 * x;
-	// ÏñËØÑÕÉ«Öµ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«Öµ
 	const ADColor color0(img0[0], img0[1], img0[2]);
 
 	top = bottom = 0;
-	//¼ÆËãÉÏÏÂ±Û,ÏÈÉÏ±ÛºóÏÂ±Û
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â±ï¿½,ï¿½ï¿½ï¿½Ï±Ûºï¿½ï¿½Â±ï¿½
 	sint32 dir = -1;
 	for (sint32 k = 0; k < 2; k++) {
-		// ÑÓÉì±ÛÖ±µ½Ìõ¼ş²»Âú×ã
-		// ±Û³¤²»µÃ³¬¹ıcross_L1
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// ï¿½Û³ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½ï¿½cross_L1
 		auto img = img0 + dir * width_ * 3;
 		auto color_last = color0;
 		sint32 yn = y + dir;
 		for (sint32 n = 0; n < std::min(cross_L1_, MAX_ARM_LENGTH); n++) {
 
-			// ±ß½ç´¦Àí
+			// ï¿½ß½ç´¦ï¿½ï¿½
 			if (k == 0) {
 				if (yn < 0) {
 					break;
@@ -230,16 +230,16 @@ void CrossAggregator::FindVerticalArm(const sint32& x, const sint32& y, uint8& t
 				}
 			}
 
-			// »ñÈ¡ÑÕÉ«Öµ
+			// ï¿½ï¿½È¡ï¿½ï¿½É«Öµ
 			const ADColor color(img[0], img[1], img[2]);
 
-			// ÑÕÉ«¾àÀë1£¨±ÛÉÏÏñËØºÍ¼ÆËãÏñËØµÄÑÕÉ«¾àÀë£©
+			// ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ØºÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ë£©
 			const sint32 color_dist1 = ColorDist(color, color0);
 			if (color_dist1 >= cross_t1_) {
 				break;
 			}
 
-			// ÑÕÉ«¾àÀë2£¨±ÛÉÏÏñËØºÍÇ°Ò»¸öÏñËØµÄÑÕÉ«¾àÀë£©
+			// ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½Ç°Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ë£©
 			if (n > 0) {
 				const sint32 color_dist2 = ColorDist(color, color_last);
 				if (color_dist2 >= cross_t1_) {
@@ -247,7 +247,7 @@ void CrossAggregator::FindVerticalArm(const sint32& x, const sint32& y, uint8& t
 				}
 			}
 
-			// ±Û³¤´óÓÚL2ºó£¬ÑÕÉ«¾àÀëãĞÖµ¼õĞ¡Îªt2
+			// ï¿½Û³ï¿½ï¿½ï¿½ï¿½ï¿½L2ï¿½ï¿½ï¿½ï¿½É«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ğ¡Îªt2
 			if (n + 1 > cross_L2_) {
 				if (color_dist1 >= cross_t2_) {
 					break;
@@ -270,8 +270,8 @@ void CrossAggregator::FindVerticalArm(const sint32& x, const sint32& y, uint8& t
 
 void CrossAggregator::ComputeSupPixelCount()
 {
-	// ¼ÆËãÃ¿¸öÏñËØµÄÖ§³ÖÇøÏñËØÊıÁ¿
-	// ×¢Òâ£ºÁ½ÖÖ²»Í¬µÄ¾ÛºÏ·½Ïò£¬ÏñËØµÄÖ§³ÖÇøÏñËØÊÇ²»Í¬µÄ£¬ĞèÒª·Ö¿ª¼ÆËã
+	// ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ×¢ï¿½â£ºï¿½ï¿½ï¿½Ö²ï¿½Í¬ï¿½Ä¾ÛºÏ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç²ï¿½Í¬ï¿½Ä£ï¿½ï¿½ï¿½Òªï¿½Ö¿ï¿½ï¿½ï¿½ï¿½ï¿½
 	bool horizontal_first = true;
 	for (sint32 n = 0; n < 2; n++) {
 		// n=0 : horizontal_first; n=1 : vertical_first
@@ -280,7 +280,7 @@ void CrossAggregator::ComputeSupPixelCount()
 			// k=0 : pass1; k=1 : pass2
 			for (sint32 y = 0; y < height_; y++) {
 				for (sint32 x = 0; x < width_; x++) {
-					// »ñÈ¡armÊıÖµ
+					// ï¿½ï¿½È¡armï¿½ï¿½Öµ
 					auto& arm = vec_cross_arms_[y*width_ + x];
 					sint32 count = 0;
 					if (horizontal_first) {
@@ -326,7 +326,7 @@ void CrossAggregator::ComputeSupPixelCount()
 
 void CrossAggregator::AggregateInArms(const sint32& disparity, const bool& horizontal_first)
 {
-	// ´Ëº¯Êı¾ÛºÏËùÓĞÏñËØµ±ÊÓ²îÎªdisparityÊ±µÄ´ú¼Û
+	// ï¿½Ëºï¿½ï¿½ï¿½ï¿½Ûºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½Ó²ï¿½ÎªdisparityÊ±ï¿½Ä´ï¿½ï¿½ï¿½
 
 	if (disparity < min_disparity_ || disparity >= max_disparity_) {
 		return;
@@ -337,24 +337,24 @@ void CrossAggregator::AggregateInArms(const sint32& disparity, const bool& horiz
 		return;
 	}
 
-	// ½«disp²ãµÄ´ú¼Û´æÈëÁÙÊ±Êı×évec_cost_tmp_[0]
-	// ÕâÑù¿ÉÒÔ±ÜÃâ¹ı¶àµÄ·ÃÎÊ¸ü´óµÄcost_aggr_,Ìá¸ß·ÃÎÊĞ§ÂÊ
+	// ï¿½ï¿½dispï¿½ï¿½Ä´ï¿½ï¿½Û´ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½vec_cost_tmp_[0]
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½Ê¸ï¿½ï¿½ï¿½ï¿½cost_aggr_,ï¿½ï¿½ß·ï¿½ï¿½ï¿½Ğ§ï¿½ï¿½
 	for (sint32 y = 0; y < height_; y++) {
 		for (sint32 x = 0; x < width_; x++) {
 			vec_cost_tmp_[0][y * width_ + x] = cost_aggr_[y * width_ * disp_range + x * disp_range + disp];
 		}
 	}
 
-	// ÖğÏñËØ¾ÛºÏ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾Ûºï¿½
 	const sint32 ct_id = horizontal_first ? 0 : 1;
 	for (sint32 k = 0; k < 2; k++) {
 		// k==0: pass1
 		// k==1: pass2
 		for (sint32 y = 0; y < height_; y++) {
 			for (sint32 x = 0; x < width_; x++) {
-				// »ñÈ¡armÊıÖµ
+				// ï¿½ï¿½È¡armï¿½ï¿½Öµ
 				auto& arm = vec_cross_arms_[y*width_ + x];
-				// ¾ÛºÏ
+				// ï¿½Ûºï¿½
 				float32 cost = 0.0f;
 				if (horizontal_first) {
 					if (k == 0) {

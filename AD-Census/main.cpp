@@ -212,8 +212,7 @@ void SaveDisparityMap(const float32* disp_map, const sint32& width, const sint32
 void SaveDisparityCloud(const uint8* img_bytes, const float32* disp_map, const sint32& width, const sint32& height, const std::string& path)
 {
 	// ±£¥Ê ”≤Óµ„‘∆(x,y,disp,r,g,b)
-	FILE* fp_disp_cloud = nullptr;
-	fopen_s(&fp_disp_cloud, (path + "-cloud.txt").c_str(), "w");
+	FILE* fp_disp_cloud = fopen((path + "-cloud.txt").c_str(), "w");
 	if (fp_disp_cloud) {
 		for (sint32 i = 0; i < height; i++) {
 			for (sint32 j = 0; j < width; j++) {
@@ -221,7 +220,7 @@ void SaveDisparityCloud(const uint8* img_bytes, const float32* disp_map, const s
 				if (disp == Invalid_Float) {
 					continue;
 				}
-				fprintf_s(fp_disp_cloud, "%f %f %f %d %d %d\n", float32(j), float32(i),
+				fprintf(fp_disp_cloud, "%f %f %f %d %d %d\n", float32(j), float32(i),
 					disp, img_bytes[i * width * 3 + 3 * j + 2], img_bytes[i * width * 3 + 3 * j + 1], img_bytes[i * width * 3 + 3 * j]);
 			}
 		}
